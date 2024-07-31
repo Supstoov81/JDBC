@@ -1,40 +1,27 @@
 package fr.diginamic.jdbc;
 
+import fr.diginamic.jdbc.dal.FournisseurDao;
+import fr.diginamic.jdbc.dal.FournisseurJDBCDAO;
 import fr.diginamic.jdbc.entites.Fournisseur;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.List;
 
 public class TestSelect {
-    private static final String DB_URL;
-    private static final String DB_USER;
-    private static final String DB_PWD;
+    public static void main(String[] args) {
+        try (Connection connection = DriverManager.getConnection("jdbc:mariadb://localhost:3308/compta", "root", "Supstoov1981?")) {
+            FournisseurDao fournisseurDAO = new FournisseurJDBCDAO(connection);
+            Fournisseur fournisseur = fournisseurDAO.selectById(1);
+            System.out.println("Fournisseur sélectionné : " + fournisseur);
 
-    static {
-        ResourceBundle bundle = ResourceBundle.getBundle("db");
-        DB_URL = bundle.getString("db.url");
-        DB_USER = bundle.getString("db.user");
-        DB_PWD = bundle.getString("db.pwd");
-
-    }
-    public static void main(String[] args) throws SQLException {
-        Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PWD);
-        System.out.println(connection);
-        Statement str = connection.createStatement();
-        ResultSet curseur = str.executeQuery("Select * from fournisseur");
-        ArrayList<Fournisseur> fournisseurList = new ArrayList<>();
-        while(curseur.next()){
-            Integer id = curseur.getInt("ID");
-            String nom = curseur.getString("Nom");
-            Fournisseur fournisseur = new Fournisseur(id, nom);
-            fournisseurList.add(fournisseur);
-            System.out.println(fournisseur);
+            List<Fournisseur> fournisseurs = fournisseurDAO.selectAll();
+            for (Fournisseur f : fournisseurs) {
+                System.out.println(f);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        curseur.close();
-        str.close();
-        connection.close();
     }
 }
-
-

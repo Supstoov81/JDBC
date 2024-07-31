@@ -15,6 +15,10 @@ public class Fournisseur {
         this.nom = nom;
     }
 
+    public Fournisseur() {
+
+    }
+
     public int getId() {
         return id;
     }
